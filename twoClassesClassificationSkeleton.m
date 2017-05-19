@@ -92,16 +92,51 @@ function twoClassesClassificationSkeleton
     for i = 1:size(C2, 1)
         yResC2Perc(i) = perceptronActivationFunc(Wperc, C2n(i, :));
     end
-    
+    figure; 
+    scatter(C1(:,1), C1(:, 2), 'x');
+    hold on;
+    scatter(C2(:,1), C2(:, 2), 'O');
+    hold on;
+    plot(Wperc);
 end
 
 %Implements the perceptron training algorithm
 function W = perceptronTraining(C1n, C2n, numIter)
-    
+    C = [C1n; C2n];
+    wi = rand(1,2);
+    wi = [1 wi];
+    [maxiC1, ~] = size(C1n);
+    [maxiC2, ~] = size(C2n);
+    tC1 = ones(1, maxiC1);
+    tC2 = -1 * ones(1, maxiC2);
+    t = [tC1 tC2];
+    maxi = maxiC1 + maxiC2;
+    for iter = 1:numIter
+        red = zeros(1,maxi);
+        for i = 1:maxi
+            red(i) = wi * C(i,:)';
+        end
+        criterioPercep = red.*t;
+        U = [];
+        for i = 1:maxi
+            criterio = criterioPercep(i);
+            if criterio <= 0
+                U = [U; C(i,:)*t(i)];
+            end
+        end
+        error = sum(U);
+        wi = wi + error;
+    end
+    W = wi;
 end
 %activation function of the perceptron algorithm
-function f = perceptronActivationFunc(W, x) 
-   
+function f = perceptronActivationFunc(W, x)
+    red = W * x';
+    if red >= 0
+        f = 1;
+    else
+        f = -1; 
+    end     
 end
 
 %C1 and C2 tagged data
